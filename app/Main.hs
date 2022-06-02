@@ -34,6 +34,7 @@ main = do
     putStr $ show argsCols ++ "\n"
 
 
+--Эта функция обрабатывает ввод условий строк/столбцов.
 readInputBlock :: IO (Int, [[Int]])
 readInputBlock = do
     n <- getLine
@@ -46,6 +47,7 @@ readInputBlock = do
         return $ checkAllNums (read n) args
 
 
+--Эта функция проверяет, что все условия - натуральные числа.
 checkAllNums :: Int -> [[String]] -> (Int, [[Int]])
 checkAllNums n args | haveInvalidArgs = (0, [[]])
                     | otherwise = (n, transformArgs args)
@@ -53,13 +55,13 @@ checkAllNums n args | haveInvalidArgs = (0, [[]])
           transformArgs args = map (map (\x -> if isNothing (readMaybe x :: Maybe Int) || read x < 1 then 0 else read x)) args
 
 
+-- Эти функции считывают строчки условий.
 readArgs :: Int -> [[String]] -> IO [[String]]
 readArgs 0 xs = do
     return xs
 readArgs n xs = do
     lineArgs <- readLineArgs
     readArgs (n - 1) (lineArgs : xs) 
-
 
 readLineArgs :: IO [String]
 readLineArgs = do
