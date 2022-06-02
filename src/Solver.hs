@@ -45,7 +45,7 @@ generateSatLine n m num_line skip_line onward_line line type_line
             
 
 
--- эта функция по m, номеру линии, откуда и сколько клеток, какого типо покраски,
+-- Эта функция по m, номеру линии, откуда и сколько клеток, какого типо покраски,
 -- возвращает формулу для этого куска клеток
 paint :: Int -> Int -> Int -> Int -> Int -> Int -> TypeLine -> Formula
 paint n m line cell_number amount cell_type type_line
@@ -61,11 +61,10 @@ getAtomF' n m line column type_line
         | type_line == Line = getAtomF m line column
         | otherwise = getAtomF n column line
 
--- Эта функция по m, строке и столбцу возвращает переменную для Formula.
--- Нумерация клеток как у матриц. Пример для m = 3:
+-- Эта функция по n, m, строке и столбцу возвращает переменную для Formula.
+-- Нумерация клеток как у матриц. Пример для n = 2, m = 3:
 -- 1 2 3
 -- 4 5 6
--- 7 8 9
 getAtomF :: Int -> Int -> Int -> Formula
 getAtomF m line column = Atom $ Var $ (line - 1) * m + column
 
@@ -99,6 +98,22 @@ parserD (Atom (Var i)) = [i]
 -- Этот блок функций с помощью вызываемых функций генерирует 4 КНФ:
 -- правила для строк, для столбцов и для обоих видов диагоналей.
 -- Потом преобразует их в [[Int]] (формат для солвера) и запускает солвер.
-process :: Int -> Int -> [[Int]] -> [[Int]] -> IO Solution
-process n m list_lines list_columns = 
-    solve $ formulaToList $ generateSat n m list_lines list_columns
+process :: (Int, [[Int]]) -> (Int, [[Int]]) -> IO Solution
+process (n, list_rows) (m, list_columns) = 
+    solve $ formulaToList $ generateSat n m list_rows list_columns
+
+
+----------------------- Блок о вывода ----------------------
+
+wordSolutionLen = 9
+
+printSolution :: Int -> Int -> Solution -> String
+printSolution n m sol = toTable n m $ read $ drop wordSolutionLen (show sol)
+
+toTable :: Int -> Int -> [Int] -> String
+toTable n pos [] = "\n"
+toTable n 0 xs = '\n' : toTable n n xs
+toTable n pos (x:xs) | x < 0 = '0' : ' ' : toTable n (pos - 1) xs
+                     | x > 0 = '+' : ' ' : toTable n (pos - 1) xs
+
+
