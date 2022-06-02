@@ -7,13 +7,13 @@ import NF
 
 ------------------------ Блок про вывод формулы --------------
 
-data TypeLine = Line | Column
+data TypeLine = Row | Column
     deriving (Eq)
 
 
 generateSat :: Int -> Int -> [[Int]] -> [[Int]] -> Formula
-generateSat n m list_lines list_columns = 
-    generateSatLines n m list_lines Line :/\
+generateSat n m list_rows list_columns = 
+    generateSatLines n m list_rows Row :/\
     generateSatLines m n list_columns Column
 
 
@@ -32,7 +32,8 @@ generateSatLines = generateSatLines' 1
 -- возвращает блок формулы для этой строки (skip_n = 0 по-умолчанию). 
 generateSatLine :: Int -> Int -> Int -> Int -> Int -> [Int] -> TypeLine -> Formula
 generateSatLine n m num_line skip_line onward_line line type_line
-    | null line = paint n num_line m (skip_line + 1) onward_line 0 type_line
+    | null line = not_paint_amount
+    | head line == 0 = not_paint_amount
     | onward_line < head line = Atom F
     | onward_line == head line && null (tail line) = paint_amount
     | onward_line == head line = Atom F
@@ -42,6 +43,7 @@ generateSatLine n m num_line skip_line onward_line line type_line
                     (paint n m num_line (skip_line + 1) 1 0 type_line :/\
                     generateSatLine n m num_line (skip_line + 1) (onward_line - 1) line type_line)
         where paint_amount = paint n m num_line (skip_line + 1) (head line) 1 type_line;
+                not_paint_amount = paint n m num_line (skip_line + 1) onward_line 0 type_line
             
 
 
@@ -57,9 +59,9 @@ paint n m line cell_number amount cell_type type_line
 
 
 getAtomF' :: Int -> Int -> Int -> Int -> TypeLine -> Formula 
-getAtomF' n m line column type_line 
-        | type_line == Line = getAtomF m line column
-        | otherwise = getAtomF n column line
+getAtomF' n m row column type_line 
+        | type_line == Row = getAtomF m row column
+        | otherwise = getAtomF n column row
 
 -- Эта функция по m, строке и столбцу возвращает переменную для Formula.
 -- Нумерация клеток как у матриц. Пример для m = 3:
@@ -67,7 +69,7 @@ getAtomF' n m line column type_line
 -- 4 5 6
 -- 7 8 9
 getAtomF :: Int -> Int -> Int -> Formula
-getAtomF m line column = Atom $ Var $ (line - 1) * m + column
+getAtomF m row column = Atom $ Var $ (row - 1) * m + column
 
 
 
@@ -100,5 +102,5 @@ parserD (Atom (Var i)) = [i]
 -- правила для строк, для столбцов и для обоих видов диагоналей.
 -- Потом преобразует их в [[Int]] (формат для солвера) и запускает солвер.
 process :: Int -> Int -> [[Int]] -> [[Int]] -> IO Solution
-process n m list_lines list_columns = 
-    solve $ formulaToList $ generateSat n m list_lines list_columns
+process n m list_rows list_columns = 
+    solve $ formulaToList $ cnf $ generateSat n m list_rows list_columns
