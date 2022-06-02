@@ -3,7 +3,7 @@
 ### Запуск программы:
 
 ```Console
-cabal run hw-mathlog2202
+cabal new-run hw-mathlog2202
 ```
 
 ### Формат ввода:
