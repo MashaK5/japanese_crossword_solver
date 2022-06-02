@@ -42,11 +42,11 @@ main = do
         (putStr "Invalid columns input! Some line is too long.\n" >> 
         exitWith ExitSuccess)
 
-    -- res <- process (numberOfRows, argsRows) (numberOfCols, argsCols)
-    -- if res == Unsatisfiable then putStr $ show res ++ "\n"
-    --     else putStr $ printSolution numberOfRows numberOfCols res ++ "\n"
-    putStr $ show argsRows ++ "\n"
-    putStr $ show argsCols ++ "\n"
+    --putStr $ show $ process (numberOfRows, argsRows) (numberOfCols, argsCols)
+
+    res <- process (numberOfRows, argsRows) (numberOfCols, argsCols)
+    if res == Unsatisfiable then putStr $ show res ++ "\n"
+        else putStr $ printSolution numberOfRows numberOfCols res ++ "\n"
 
 
 --Эта функция обрабатывает ввод условий строк/столбцов.
