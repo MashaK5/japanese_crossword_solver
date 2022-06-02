@@ -6,15 +6,30 @@ import Data.Maybe (isNothing)
 import Text.Read (readMaybe, readEither)
 
 
+
 main :: IO ()
 main = do
+    (numberOfRows, argsRows) <- readInputBlock
+    if numberOfRows == 0
+        then putStr "Invalid rows input! All elements must be natural numbers separated by spaces.\n"
+    else do     
+        (numberOfCols, argsCols) <- readInputBlock
+        if numberOfRows == 0
+            then putStr "Invalid columns input! All elements must be natural numbers separated by spaces.\n"    
+        else do    
+            putStr $ show argsRows ++ "\n"
+            putStr $ show argsCols ++ "\n"
+
+
+readInputBlock :: IO (Int, [[Int]])
+readInputBlock = do
     n <- getLine
     if isNothing (readMaybe n :: Maybe Int) || read n < 1 
-        then putStr "'n' must be a natural number!\n"
-    else do   
-        args <- readArgs (read n) []
-        let res = reverse args
-        putStr $ show res ++ "\n"
+        then return (0, [[]])
+    else do
+        revArgs <- readArgs (read n) []
+        let args = reverse revArgs
+        return (read n, args)
 
 
 readArgs :: Int -> [[Int]] -> IO [[Int]]
@@ -29,4 +44,5 @@ readLineArgs :: IO [Int]
 readLineArgs = do
     s <- getLine
     return $ map read $ words s
+
 
