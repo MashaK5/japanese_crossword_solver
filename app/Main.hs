@@ -18,7 +18,7 @@ main = do
 
     putStr "Enter the number of columns:\n"
     (numberOfCols, argsCols) <- readInputBlock
-    when (numberOfRows == 0)
+    when (numberOfCols == 0)
         (putStr "Invalid columns input! All elements must be natural numbers separated by spaces.\n" >> 
         exitWith ExitSuccess)  
 
