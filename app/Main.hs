@@ -6,7 +6,6 @@ import Data.Maybe (isNothing)
 import Text.Read (readMaybe, readEither)
 
 
-
 main :: IO ()
 main = do
     (numberOfRows, argsRows) <- readInputBlock
@@ -14,7 +13,7 @@ main = do
         then putStr "Invalid rows input! All elements must be natural numbers separated by spaces.\n"
     else do     
         (numberOfCols, argsCols) <- readInputBlock
-        if numberOfRows == 0
+        if numberOfCols == 0
             then putStr "Invalid columns input! All elements must be natural numbers separated by spaces.\n"    
         else do    
             putStr $ show argsRows ++ "\n"
@@ -29,10 +28,17 @@ readInputBlock = do
     else do
         revArgs <- readArgs (read n) []
         let args = reverse revArgs
-        return (read n, args)
+        return $ checkAllNums (read n) args
 
 
-readArgs :: Int -> [[Int]] -> IO [[Int]]
+checkAllNums :: Int -> [[String]] -> (Int, [[Int]])
+checkAllNums n args | haveInvalidArgs = (0, [[]])
+                    | otherwise = (n, transformArgs args)
+    where haveInvalidArgs = length (filter (/= 0) (map (length . filter (== 0)) (transformArgs args))) /= 0               
+          transformArgs args = map (map (\x -> if isNothing (readMaybe x :: Maybe Int) || read x < 1 then 0 else read x)) args
+
+
+readArgs :: Int -> [[String]] -> IO [[String]]
 readArgs 0 xs = do
     return xs
 readArgs n xs = do
@@ -40,9 +46,9 @@ readArgs n xs = do
     readArgs (n - 1) (lineArgs : xs) 
 
 
-readLineArgs :: IO [Int]
+readLineArgs :: IO [String]
 readLineArgs = do
     s <- getLine
-    return $ map read $ words s
+    return $ words s
 
 
