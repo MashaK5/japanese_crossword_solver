@@ -132,7 +132,7 @@ printSolution rowsRules colsRules sol = '\n' : (toTable rowsRules colsRules $ re
 toTable :: (Int, [[Int]]) -> (Int, [[Int]]) -> [Int] -> String
 toTable rowsRules colsRules sol  = (topPart (maxLenRules rowsRules) (maxLenRules colsRules) (addBeginToList (maxLenRules colsRules) colsRules) 1 1) 
                                    ++
-                                   bottomPart
+                                   (bottomPart (maxLenRules rowsRules) (maxLenRules colsRules) (addBeginToList (maxLenRules rowsRules) rowsRules) (fst colsRules) sol 1 1)
 
 maxLenRules :: (Int, [[Int]]) -> Int
 maxLenRules (n, listRows) = maximum $ map length listRows
@@ -144,7 +144,7 @@ addBeginToList len (count, listLines) = (count, map (\l -> addLen len (length l)
 
 
 topPart :: Int -> Int -> (Int, [[Int]]) -> Int -> Int -> String
-topPart lenRulesRows lenRulesCols (m, newListRows) curR curPos | curR == lenRulesCols + 1       = "\n"
+topPart lenRulesRows lenRulesCols (m, newListRows) curR curPos | curR == lenRulesCols + 1       = ""
                                                                | curPos == lenRulesRows + m + 1 = '\n' : topPart lenRulesRows lenRulesCols (m, newListRows) (curR + 1) 1
                                                                | curPos < lenRulesRows          = ' ' : topPart lenRulesRows lenRulesCols (m, newListRows) curR (curPos + 1)
                                                                | curPos == lenRulesRows         = ' ' : '║' : topPart lenRulesRows lenRulesCols (m, newListRows) curR (curPos + 1)
@@ -152,7 +152,14 @@ topPart lenRulesRows lenRulesCols (m, newListRows) curR curPos | ((newListRows !
                                                                | otherwise                         = (show (newListRows !! (curPos - lenRulesRows - 1) !! (curR - 1))) ++ ('║' : topPart lenRulesRows lenRulesCols (m, newListRows) curR (curPos + 1))
 
 
-bottomPart = ""
+bottomPart :: Int -> Int -> (Int, [[Int]]) -> Int -> [Int] -> Int -> Int -> String
+bottomPart lenRulesRows lenRulesCols (n, newListCols) m sol curR curPos | curR == n + 1                                                              = ""
+                                                                      | curPos == lenRulesRows + m + 1                                               = '\n' : bottomPart lenRulesRows lenRulesCols (n, newListCols) m sol (curR + 1) 1
+                                                                      | (curPos < lenRulesRows && (newListCols !! (curR - 1) !! (curPos - 1)) == -1) = ' ' : bottomPart lenRulesRows lenRulesCols (n, newListCols) m sol curR (curPos + 1)
+                                                                      | (curPos < lenRulesRows && (newListCols !! (curR - 1) !! (curPos - 1)) /= -1) = (show (newListCols !! (curR - 1) !! (curPos - 1))) ++ bottomPart lenRulesRows lenRulesCols (n, newListCols) m sol curR (curPos + 1)
+                                                                      | curPos == lenRulesRows                                                       = (show (newListCols !! (curR - 1) !! (curPos - 1))) ++ ('║' : bottomPart lenRulesRows lenRulesCols (n, newListCols) m sol curR (curPos + 1))
+bottomPart lenRulesRows lenRulesCols (n, newListCols) m (x:xs) curR curPos | x < 0 = ' ' : '║' : bottomPart lenRulesRows lenRulesCols (n, newListCols) m xs curR (curPos + 1)
+                                                                           | x > 0 = '+' : '║' : bottomPart lenRulesRows lenRulesCols (n, newListCols) m xs curR (curPos + 1)
 
 
 
