@@ -136,6 +136,7 @@ toTable rowsRules colsRules sol  = (topPart (maxLenRules rowsRules) (maxLenRules
                                    ++
                                    (bottomPart (maxLenRules rowsRules) (maxLenRules colsRules) (addBeginToList (maxLenRules rowsRules) rowsRules) (fst colsRules) sol 1 1)
 
+-- Эта функция считает ширину частей таблицы, к которых написаны правила.
 maxLenRules :: (Int, [[Int]]) -> Int
 maxLenRules (n, listRows) = maximum $ map length listRows
 
@@ -145,6 +146,7 @@ addBeginToList len (count, listLines) = (count, map (\l -> addLen len (length l)
                                      | otherwise     = (-1) : (addLen len (curLen + 1) listLine)
 
 
+-- Эта функция рисует верхнюю часть таблицы.
 topPart :: Int -> Int -> (Int, [[Int]]) -> Int -> Int -> String
 topPart lenRulesRows lenRulesCols (m, newListRows) curR curPos
     | curR == lenRulesCols + 1       = ""
@@ -155,7 +157,7 @@ topPart lenRulesRows lenRulesCols (m, newListRows) curR curPos
     | (newListRows !! (curPos - lenRulesRows - 1) !! (curR - 1)) == -1 = ' ' : '║' : topPart lenRulesRows lenRulesCols (m, newListRows) curR (curPos + 1)
     | otherwise                         = show (newListRows !! (curPos - lenRulesRows - 1) !! (curR - 1)) ++ ('║' : topPart lenRulesRows lenRulesCols (m, newListRows) curR (curPos + 1))
 
-
+-- Эта функция рисует нижнюю часть таблицы.
 bottomPart :: Int -> Int -> (Int, [[Int]]) -> Int -> [Int] -> Int -> Int -> String
 bottomPart lenRulesRows lenRulesCols (n, newListCols) m sol curR curPos
     | curR == n + 1                                                              = ""
@@ -168,7 +170,7 @@ bottomPart lenRulesRows lenRulesCols (n, newListCols) m (x:xs) curR curPos
     | x < 0 = ' ' : '║' : bottomPart lenRulesRows lenRulesCols (n, newListCols) m xs curR (curPos + 1)
     | x > 0 = '╳' : '║' : bottomPart lenRulesRows lenRulesCols (n, newListCols) m xs curR (curPos + 1)
 
-
+-- Эта функия рисует горизонтальные линии разметки.
 betweenLine :: Int -> Int -> Int -> String
 betweenLine (-1) 1 1 = "═╣\n"
 betweenLine (-1) 0 1 = "\n" 
@@ -179,3 +181,5 @@ betweenLine (-1) 0 0 = "\n"
 betweenLine 0 m flag@0 = "╩" ++ betweenLine (-1) m flag
 betweenLine (-1) m flag@0 = "═╩" ++ betweenLine (-1) (m - 1) flag
 betweenLine lenRulesRows m flag = "═" ++ betweenLine (lenRulesRows - 1) m flag
+
+

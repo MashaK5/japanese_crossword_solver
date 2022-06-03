@@ -42,8 +42,6 @@ main = do
         (putStr "Invalid columns input! Some line is too long.\n" >> 
         exitWith ExitSuccess)
 
-    --putStr $ show $ process (numberOfRows, argsRows) (numberOfCols, argsCols)
-
     res <- process (numberOfRows, argsRows) (numberOfCols, argsCols)
     if res == Unsatisfiable then putStr $ show res ++ "\n"
         else putStr $ printSolution (numberOfRows, argsRows) (numberOfCols, argsCols) res ++ "\n"
