@@ -126,13 +126,20 @@ parserD (Atom T) = (False, [0])
 wordSolutionLen = 9
 
 printSolution :: Int -> Int -> Solution -> String
-printSolution n m sol = toTable n m m $ read $ drop wordSolutionLen (show sol)
+printSolution n m sol = toTable n m m 1 $ read $ drop wordSolutionLen (show sol)
 
-toTable :: Int -> Int -> Int -> [Int] -> String
-toTable n m pos [] = "\n"
-toTable n m 0 xs = '\n' : toTable n m m xs
-toTable n m pos (x:xs) | x < 0 = '0' : ' ' : toTable n m (pos - 1) xs
-                       | x > 0 = '+' : ' ' : toTable n m (pos - 1) xs
+toTable :: Int -> Int -> Int -> Int -> [Int] -> String
+toTable n m 0 0 xs = '\n' : toTable n m m 1 xs
+toTable n m pos 0 [] = "\n"
+toTable n m 0 1 xs = '\n' : toTable n m m 0 xs
+toTable n m pos 0 (x:xs)    
+            | x < 0 = ' ' : '║' : toTable n m (pos - 1) 0 xs
+            | x > 0 = '+' : '║' : toTable n m (pos - 1) 0 xs
+
+toTable n m pos@1 1 xs@[] = '═' : '╝' : toTable n m (pos - 1) 1 xs
+toTable n m pos 1 xs@[] = '═' : '╩' : toTable n m (pos - 1) 1 xs
+toTable n m pos@1 1 xs = '═' : '╣' : toTable n m (pos - 1) 1 xs
+toTable n m pos 1 xs = '═' : '╬' : toTable n m (pos - 1) 1 xs
 
 
 
