@@ -28,6 +28,44 @@ cabal new-run hw-mathlog2202
 
 ### Формат вывода:
 
+Выводится классический вид японского кроссворда с решением, если оно есть.
+И `Unsatisfiable` если решение не существует.
+
+
+### Пример:
+
+```Console
+Enter the number of rows:
+5
+Enter the specified number of lines:
+2
+1 1
+1
+3
+1 1
+Enter the number of columns:
+4
+Enter the specified number of lines:
+1
+4
+1 1
+2 1
+
+  ║ ║ ║1║2║
+  ║1║4║1║1║
+══╬═╬═╬═╬═╣
+ 2║ ║ ║+║+║
+══╬═╬═╬═╬═╣
+11║ ║+║ ║+║
+══╬═╬═╬═╬═╣
+ 1║ ║+║ ║ ║
+══╬═╬═╬═╬═╣
+ 3║+║+║+║ ║
+══╬═╬═╬═╬═╣
+11║ ║+║ ║+║
+══╩═╩═╩═╩═╝
+```
+
 
 
 
