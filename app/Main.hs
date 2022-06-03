@@ -46,7 +46,7 @@ main = do
 
     res <- process (numberOfRows, argsRows) (numberOfCols, argsCols)
     if res == Unsatisfiable then putStr $ show res ++ "\n"
-        else putStr $ printSolution numberOfRows numberOfCols res ++ "\n"
+        else putStr $ printSolution (numberOfRows, argsRows) (numberOfCols, argsCols) res ++ "\n"
 
 
 --Эта функция обрабатывает ввод условий строк/столбцов.

@@ -26,7 +26,7 @@ cabal new-run hw-mathlog2202
 В конце ввода программа проверяет, что введенные условия коректны и не противоречат друг другу. При некорректных условиях программа выведет **Invalid rows input! Some line is too long.** или **Invalid colums input! Some line is too long.**
 
 
-### Формат выывода:
+### Формат вывода:
 
 
 
