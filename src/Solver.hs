@@ -11,7 +11,7 @@ import NF
 -- правила для строк, для столбцов и для обоих видов диагоналей.
 -- Потом преобразует их в [[Int]] (формат для солвера) и запускает солвер.
 process :: (Int, [[Int]]) -> (Int, [[Int]]) -> IO Solution
-process (n, listRows) (m, listColumns) = 
+process (n, listRows) (m, listColumns) =
     solve $ formulaToList $ cnf $ generateSat n m listRows listColumns
 
 
@@ -22,8 +22,8 @@ data TypeLine = Row | Column
 
 
 generateSat :: Int -> Int -> [[Int]] -> [[Int]] -> Formula
-generateSat n m listRows listColumns = 
-    generateSatLines n m listRows Row 
+generateSat n m listRows listColumns =
+    generateSatLines n m listRows Row
     :/\
     generateSatLines m n listColumns Column
 
@@ -33,7 +33,7 @@ generateSatLines = generateSatLines' 1
 generateSatLines' :: Int -> Int -> Int -> [[Int]] -> TypeLine -> Formula
 generateSatLines' n' n m lines typeLine
     | n' > n = Atom T
-    | otherwise = generateSatLine n m n' 0 m (head lines) typeLine 
+    | otherwise = generateSatLine n m n' 0 m (head lines) typeLine
                 :/\
                  generateSatLines'  (n' + 1) n m (tail lines) typeLine
 
@@ -48,21 +48,21 @@ generateSatLine n m numLine skipLine onwardLine line typeLine
     | onwardLine == head line && null (tail line) = paintAmount
     | onwardLine == head line = Atom F
     | otherwise =   (
-                    paintAmount 
+                    paintAmount
                     :/\
-                    paint n m numLine (skipLine + 1 + head line) 1 0 typeLine 
+                    paint n m numLine (skipLine + 1 + head line) 1 0 typeLine
                     :/\
                     generateSatLine n m numLine (skipLine + head line + 1) (onwardLine - 1 - head line) (tail line) typeLine
-                    ) 
+                    )
                     :\/
                     (
-                    paint n m numLine (skipLine + 1) 1 0 typeLine 
+                    paint n m numLine (skipLine + 1) 1 0 typeLine
                     :/\
                     generateSatLine n m numLine (skipLine + 1) (onwardLine - 1) line typeLine
                     )
         where paintAmount = paint n m numLine (skipLine + 1) (head line) 1 typeLine;
               notPaintAmount = paint n m numLine (skipLine + 1) onwardLine 0 typeLine
-            
+
 
 -- Эта функция по n, m, номеру линии, откуда и сколько клеток, какого типа покраска,
 -- возвращает формулу для этого куска клеток
@@ -74,8 +74,8 @@ paint n m line cellNumber amount cellType typeLine
     where next = paint n m line (cellNumber + 1) (amount - 1) cellType typeLine;
           new = getAtomF' n m line cellNumber typeLine
 
-getAtomF' :: Int -> Int -> Int -> Int -> TypeLine -> Formula 
-getAtomF' n m row column typeLine 
+getAtomF' :: Int -> Int -> Int -> Int -> TypeLine -> Formula
+getAtomF' n m row column typeLine
         | typeLine == Row = getAtomF m row column
         | otherwise = getAtomF n column row
 
@@ -130,7 +130,9 @@ printSolution rowsRules colsRules sol = '\n' : (toTable rowsRules colsRules $ re
 
 
 toTable :: (Int, [[Int]]) -> (Int, [[Int]]) -> [Int] -> String
-toTable rowsRules colsRules sol  = (topPart (maxLenRules rowsRules) (maxLenRules colsRules) (addBeginToList (maxLenRules colsRules) colsRules) 1 1) 
+toTable rowsRules colsRules sol  = (topPart (maxLenRules rowsRules) (maxLenRules colsRules) (addBeginToList (maxLenRules colsRules) colsRules) 1 1)
+                                   ++
+                                   betweenLine (maxLenRules rowsRules) (fst colsRules) 1
                                    ++
                                    (bottomPart (maxLenRules rowsRules) (maxLenRules colsRules) (addBeginToList (maxLenRules rowsRules) rowsRules) (fst colsRules) sol 1 1)
 
@@ -144,36 +146,36 @@ addBeginToList len (count, listLines) = (count, map (\l -> addLen len (length l)
 
 
 topPart :: Int -> Int -> (Int, [[Int]]) -> Int -> Int -> String
-topPart lenRulesRows lenRulesCols (m, newListRows) curR curPos | curR == lenRulesCols + 1       = ""
-                                                               | curPos == lenRulesRows + m + 1 = '\n' : topPart lenRulesRows lenRulesCols (m, newListRows) (curR + 1) 1
-                                                               | curPos < lenRulesRows          = ' ' : topPart lenRulesRows lenRulesCols (m, newListRows) curR (curPos + 1)
-                                                               | curPos == lenRulesRows         = ' ' : '║' : topPart lenRulesRows lenRulesCols (m, newListRows) curR (curPos + 1)
-topPart lenRulesRows lenRulesCols (m, newListRows) curR curPos | ((newListRows !! (curPos - lenRulesRows - 1) !! (curR - 1))) == -1 = ' ' : '║' : topPart lenRulesRows lenRulesCols (m, newListRows) curR (curPos + 1)
-                                                               | otherwise                         = (show (newListRows !! (curPos - lenRulesRows - 1) !! (curR - 1))) ++ ('║' : topPart lenRulesRows lenRulesCols (m, newListRows) curR (curPos + 1))
+topPart lenRulesRows lenRulesCols (m, newListRows) curR curPos
+    | curR == lenRulesCols + 1       = ""
+    | curPos == lenRulesRows + m + 1 = '\n' : topPart lenRulesRows lenRulesCols (m, newListRows) (curR + 1) 1
+    | curPos < lenRulesRows          = ' ' : topPart lenRulesRows lenRulesCols (m, newListRows) curR (curPos + 1)
+    | curPos == lenRulesRows         = ' ' : '║' : topPart lenRulesRows lenRulesCols (m, newListRows) curR (curPos + 1)
+topPart lenRulesRows lenRulesCols (m, newListRows) curR curPos
+    | (newListRows !! (curPos - lenRulesRows - 1) !! (curR - 1)) == -1 = ' ' : '║' : topPart lenRulesRows lenRulesCols (m, newListRows) curR (curPos + 1)
+    | otherwise                         = show (newListRows !! (curPos - lenRulesRows - 1) !! (curR - 1)) ++ ('║' : topPart lenRulesRows lenRulesCols (m, newListRows) curR (curPos + 1))
 
 
 bottomPart :: Int -> Int -> (Int, [[Int]]) -> Int -> [Int] -> Int -> Int -> String
-bottomPart lenRulesRows lenRulesCols (n, newListCols) m sol curR curPos | curR == n + 1                                                              = ""
-                                                                      | curPos == lenRulesRows + m + 1                                               = '\n' : bottomPart lenRulesRows lenRulesCols (n, newListCols) m sol (curR + 1) 1
-                                                                      | (curPos < lenRulesRows && (newListCols !! (curR - 1) !! (curPos - 1)) == -1) = ' ' : bottomPart lenRulesRows lenRulesCols (n, newListCols) m sol curR (curPos + 1)
-                                                                      | (curPos < lenRulesRows && (newListCols !! (curR - 1) !! (curPos - 1)) /= -1) = (show (newListCols !! (curR - 1) !! (curPos - 1))) ++ bottomPart lenRulesRows lenRulesCols (n, newListCols) m sol curR (curPos + 1)
-                                                                      | curPos == lenRulesRows                                                       = (show (newListCols !! (curR - 1) !! (curPos - 1))) ++ ('║' : bottomPart lenRulesRows lenRulesCols (n, newListCols) m sol curR (curPos + 1))
-bottomPart lenRulesRows lenRulesCols (n, newListCols) m (x:xs) curR curPos | x < 0 = ' ' : '║' : bottomPart lenRulesRows lenRulesCols (n, newListCols) m xs curR (curPos + 1)
-                                                                           | x > 0 = '+' : '║' : bottomPart lenRulesRows lenRulesCols (n, newListCols) m xs curR (curPos + 1)
+bottomPart lenRulesRows lenRulesCols (n, newListCols) m sol curR curPos
+    | curR == n + 1                                                              = ""
+    | curR == n &&  curPos == lenRulesRows + m + 1                               = '\n' : betweenLine lenRulesRows m 0
+    | curPos == lenRulesRows + m + 1                                             = '\n' : betweenLine lenRulesRows m 1 ++ bottomPart lenRulesRows lenRulesCols (n, newListCols) m sol (curR + 1) 1
+    | curPos < lenRulesRows && (newListCols !! (curR - 1) !! (curPos - 1)) == -1 = ' ' : bottomPart lenRulesRows lenRulesCols (n, newListCols) m sol curR (curPos + 1)
+    | curPos < lenRulesRows && (newListCols !! (curR - 1) !! (curPos - 1)) /= -1 = (show (newListCols !! (curR - 1) !! (curPos - 1))) ++ bottomPart lenRulesRows lenRulesCols (n, newListCols) m sol curR (curPos + 1)
+    | curPos == lenRulesRows                                                     = (show (newListCols !! (curR - 1) !! (curPos - 1))) ++ ('║' : bottomPart lenRulesRows lenRulesCols (n, newListCols) m sol curR (curPos + 1))
+bottomPart lenRulesRows lenRulesCols (n, newListCols) m (x:xs) curR curPos 
+    | x < 0 = ' ' : '║' : bottomPart lenRulesRows lenRulesCols (n, newListCols) m xs curR (curPos + 1)
+    | x > 0 = '╳' : '║' : bottomPart lenRulesRows lenRulesCols (n, newListCols) m xs curR (curPos + 1)
 
 
-
--- toTable nAndR mAndC 0 0 xs   = '\n' : toTable nAndR mAndC mAndC 1 xs
--- toTable nAndR mAndC pos 0 [] = "\n"
--- toTable nAndR mAndC 0 1 xs   = '\n' : toTable nAndR mAndC mAndC 0 xs
--- toTable nAndR mAndC pos 0 (x:xs)    
---             | x < 0 = ' ' : '║' : toTable nAndR mAndC (pos - 1) 0 xs
---             | x > 0 = '+' : '║' : toTable nAndR mAndC (pos - 1) 0 xs
-
--- toTable nAndR mAndC pos@1 1 xs@[] = '═' : '╝' : toTable nAndR mAndC (pos - 1) 1 xs
--- toTable nAndR mAndC pos 1 xs@[]   = '═' : '╩' : toTable nAndR mAndC (pos - 1) 1 xs
--- toTable nAndR mAndC pos@1 1 xs    = '═' : '╣' : toTable nAndR mAndC (pos - 1) 1 xs
--- toTable nAndR mAndC pos 1 xs      = '═' : '╬' : toTable nAndR mAndC (pos - 1) 1 xs
-
-
-
+betweenLine :: Int -> Int -> Int -> String
+betweenLine (-1) 1 1 = "═╣\n"
+betweenLine (-1) 0 1 = "\n" 
+betweenLine 0 m flag@1 = "╬" ++ betweenLine (-1) m flag
+betweenLine (-1) m flag@1 = "═╬" ++ betweenLine (-1) (m - 1) flag
+betweenLine (-1) 1 0 = "═╝\n"
+betweenLine (-1) 0 0 = "\n" 
+betweenLine 0 m flag@0 = "╩" ++ betweenLine (-1) m flag
+betweenLine (-1) m flag@0 = "═╩" ++ betweenLine (-1) (m - 1) flag
+betweenLine lenRulesRows m flag = "═" ++ betweenLine (lenRulesRows - 1) m flag
